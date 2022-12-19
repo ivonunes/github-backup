@@ -89,7 +89,11 @@ function bundleRepository(repository) {
 
   try {
     log(chalk.blue(`⬇️  Cloning ${full_name} ➡️  ${cloneRepoPath}`));
-    const url = process.env.USE_SSH_URL === "true" ? ssh_url : clone_url;
+    let url = process.env.USE_SSH_URL === "true" ? ssh_url : clone_url;
+    if (process.env.USE_SSH_URL !== "true" && process.env.GITHUB_USERNAME) {
+	  url = url.split("://");
+	  url = url[0] + "://" + process.env.GITHUB_USERNAME + ":" + process.env.GITHUB_TOKEN + "@" + url[1];
+    }
     execSync(`git clone --mirror ${url} .`, {
       cwd: cloneRepoPath,
       stdio: "pipe",
